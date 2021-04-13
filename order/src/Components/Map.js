@@ -6,9 +6,11 @@ import {
   Marker,
   InfoWindow,
 } from "react-google-maps";
+import styled from "styled-components";
 import "./Map.css";
 import Locate from "./Locate";
 import Pickup from "./Pickup";
+import Dropoff from "./Dropoff";
 
 const zoom = 10;
 
@@ -17,6 +19,7 @@ function Map() {
     lat: 45.421,
     lng: -75.697,
   });
+  const [focus, setFocus] = useState("");
   const [pickup, setPickup] = useState("");
   const [dropoff, setDropoff] = useState("");
 
@@ -24,11 +27,6 @@ function Map() {
     disableDefaultUI: true,
     zoomControl: true,
   };
-
-  const mapRef = React.useRef();
-  const onMapLoad = React.useCallback((map) => {
-    mapRef.current = map;
-  }, []);
 
   // function success(pos) {
   //   const latitude = parseFloat(pos.coords.latitude)
@@ -38,11 +36,6 @@ function Map() {
   // }
   // navigator.geolocation.getCurrentPosition(success)
 
-  // const panTo = React.useCallback(({ lat, lng }) => {
-  //   console.log({ lat, lng })
-  //   mapRef.current.panTo({ lat, lng});
-  //   mapRef.current.setZoom(14);
-  // }, []);
   const panTo = ({ lat, lng }) => {
     const locationPan = { lat, lng };
 
@@ -85,15 +78,17 @@ function Map() {
   };
 
   return (
-    <div>
-      <Pickup panTo={panTo} />
-      <Locate panTo={panTo} />
+    <StyledHMap>
+      <StyledHeader>
+        {focus === "dropoff" ? null : <Pickup panTo={panTo} setFocus={setFocus} />}
+        {focus === "pickup" ? null : <Dropoff panTo={panTo} setFocus={setFocus} />}
+        <Locate panTo={panTo} />
+      </StyledHeader>
       <GoogleMap
         defaultZoom={zoom}
         defaultCenter={center}
         center={center}
         options={options}
-        // onLoad={onGoogleMapLoad}
       >
         <Marker
           position={center}
@@ -107,10 +102,28 @@ function Map() {
           <div>Your location</div>
         </InfoWindow>
       </GoogleMap>
-    </div>
+    </StyledHMap>
   );
 }
 
 const WrappedMap = withScriptjs(withGoogleMap(Map));
+
+const StyledHMap = styled.div`
+  display: flex;
+  justify-content: center;
+`
+
+const StyledHeader = styled.div`
+  background-color: white;
+  border: 2px solid blue;
+  position: absolute;
+  top: 0rem;
+  // left: 50%;
+  // transform: translateX(-50%);
+  width: 95%;
+  height: 170px;
+  margin: 0 auto;
+  // z-index: 10;
+`;
 
 export default WrappedMap;

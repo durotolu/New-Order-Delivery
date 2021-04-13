@@ -12,7 +12,7 @@ import {
 import styled from "styled-components";
 
 
-function Pickup({ panTo, setFocus }) {
+function Dropoff({ panTo, setFocus }) {
   const {
     ready,
     value,
@@ -50,8 +50,8 @@ function Pickup({ panTo, setFocus }) {
             setValue(e.target.value);
           }}
           disabled={!ready}
-          placeholder="Pickup address"
-          onFocus={() => setFocus("pickup")}
+          placeholder="Dropoff address"
+          onFocus={() => setFocus("dropoff")}
           onBlur={() => setFocus("")}
         />
         <ComboboxPopover>
@@ -69,7 +69,7 @@ function Pickup({ panTo, setFocus }) {
 
 const StyledCombobox = styled.div`
   position: absolute;
-  top: 1.5rem;
+  top: 5.5rem;
   left: 50%;
   transform: translateX(-50%);
   width: 100%
@@ -93,4 +93,4 @@ const StyledCombobox = styled.div`
   }
 `;
 
-export default Pickup;
+export default Dropoff;
