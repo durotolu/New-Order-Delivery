@@ -1,0 +1,11 @@
+.gm-ui-hover-effect {
+    display: none !important;
+}
+
+.gm-style .gm-style-iw-c {
+    top: -35px;
+}
+
+.gm-style .gm-style-iw-t::after {
+    display: none;
+}
