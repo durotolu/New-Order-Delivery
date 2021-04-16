@@ -37,7 +37,7 @@ function Dropoff({ panTo, setFocus }) {
             const results = await getGeocode({ address });
             const { lat, lng } = await getLatLng(results[0]);
             console.log(lat, lng);
-            panTo({ lat, lng });
+            panTo({ lat, lng }, 'dropoff');
           } catch (error) {
             console.log(error);
           }
@@ -47,6 +47,7 @@ function Dropoff({ panTo, setFocus }) {
         <ComboboxInput
           value={value}
           onChange={(e) => {
+            console.log(e.target.value)
             setValue(e.target.value);
           }}
           disabled={!ready}
