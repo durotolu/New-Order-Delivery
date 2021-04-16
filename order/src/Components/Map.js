@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   GoogleMap,
   withScriptjs,
@@ -22,66 +22,78 @@ function Map() {
   const [focus, setFocus] = useState("");
   const [pickup, setPickup] = useState("");
   const [dropoff, setDropoff] = useState("");
+  const [fieldLocation, setFieldLocation] = useState("");
 
   const options = {
     disableDefaultUI: true,
     zoomControl: true,
   };
 
-  // function success(pos) {
-  //   const latitude = parseFloat(pos.coords.latitude)
-  //   const longitude = pos.coords.longitude
-  //   console.log({ latitude, longitude})
-  //   setCenter({ latitude, longitude})
-  // }
-  // navigator.geolocation.getCurrentPosition(success)
-
-  const panTo = ({ lat, lng }) => {
-    const locationPan = { lat, lng };
-
-    // if (typeof Number.prototype.toRad === "undefined") {
-    //   Number.prototype.toRad = function () {
-    //     return (this * Math.PI) / 180;
-    //   };
-    // }
-
-    // //-- Define degrees function
-    // if (typeof Number.prototype.toDeg === "undefined") {
-    //   Number.prototype.toDeg = function () {
-    //     return this * (180 / Math.PI);
-    //   };
-    // }
-
-    // //-- Define middle point function
-    // function middlePoint(lat1, lng1, lat2, lng2) {
-    //   //-- Longitude difference
-    //   var dLng = (lng2 - lng1).toRad();
-
-    //   //-- Convert to radians
-    //   lat1 = lat1.toRad();
-    //   lat2 = lat2.toRad();
-    //   lng1 = lng1.toRad();
-
-    //   var bX = Math.cos(lat2) * Math.cos(dLng);
-    //   var bY = Math.cos(lat2) * Math.sin(dLng);
-    //   var lat3 = Math.atan2(
-    //     Math.sin(lat1) + Math.sin(lat2),
-    //     Math.sqrt((Math.cos(lat1) + bX) * (Math.cos(lat1) + bX) + bY * bY)
-    //   );
-    //   var lng3 = lng1 + Math.atan2(bY, Math.cos(lat1) + bX);
-
-    //   //-- Return result
-    //   return [lng3.toDeg(), lat3.toDeg()];
-    // }
-
-    setCenter(locationPan);
+  const panTo = ({ lat, lng }, field) => {
+    if (field === 'pickup') {
+      console.log(field)
+      setPickup({ lat, lng })
+      setFieldLocation(field)
+    }
+    if (field === 'dropoff') {
+      console.log(field)
+      setDropoff({ lat, lng })
+      setFieldLocation(field)
+    }
   };
+
+  useEffect(() => {
+    if (pickup && dropoff) {
+      let lat1 = pickup.lat
+      let lat2 = pickup.lng
+      let lng1 = dropoff.lat
+      let lng2 = dropoff.lng
+
+      var dLng = (lng2 - lng1)
+      dLng = (dLng * Math.PI) / 180
+      //-- Convert to radians
+      lat1 = (lat1 * Math.PI) / 180
+      lat2 = (lat2 * Math.PI) / 180
+      lng1 = (lng1 * Math.PI) / 180
+
+      var bX = Math.cos(lat2) * Math.cos(dLng);
+      var bY = Math.cos(lat2) * Math.sin(dLng);
+      var lat3 = Math.atan2(
+        Math.sin(lat1) + Math.sin(lat2),
+        Math.sqrt((Math.cos(lat1) + bX) * (Math.cos(lat1) + bX) + bY * bY)
+      );
+      var lng3 = lng1 + Math.atan2(bY, Math.cos(lat1) + bX);
+
+      //-- Return result
+      let lng = lng3 * (180 / Math.PI);
+      let lat = lat3 * (180 / Math.PI);
+
+      let midPoint = {
+        lat,
+        lng
+      }
+
+      setCenter(midPoint)
+
+    } else {
+      if (fieldLocation === 'pickup') {
+        setCenter(pickup)
+      }
+      if (fieldLocation === 'dropoff') {
+        setCenter(dropoff)
+      }
+    }
+  }, [pickup, dropoff, fieldLocation])
 
   return (
     <StyledHMap>
       <StyledHeader>
-        {focus === "dropoff" ? null : <Pickup panTo={panTo} setFocus={setFocus} />}
-        {focus === "pickup" ? null : <Dropoff panTo={panTo} setFocus={setFocus} />}
+        {focus === "dropoff" ? null : (
+          <Pickup panTo={panTo} setFocus={setFocus} setPickup={setPickup} pickup={pickup} />
+        )}
+        {focus === "pickup" ? null : (
+          <Dropoff panTo={panTo} setFocus={setFocus} />
+        )}
         <Locate panTo={panTo} />
       </StyledHeader>
       <GoogleMap
@@ -111,7 +123,7 @@ const WrappedMap = withScriptjs(withGoogleMap(Map));
 const StyledHMap = styled.div`
   display: flex;
   justify-content: center;
-`
+`;
 
 const StyledHeader = styled.div`
   background-color: white;
