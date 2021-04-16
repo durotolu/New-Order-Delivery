@@ -37,7 +37,7 @@ function Pickup({ panTo, setFocus }) {
             const results = await getGeocode({ address });
             const { lat, lng } = await getLatLng(results[0]);
             console.log(lat, lng);
-            panTo({ lat, lng });
+            panTo({ lat, lng }, 'pickup');
           } catch (error) {
             console.log(error);
           }
@@ -54,14 +54,16 @@ function Pickup({ panTo, setFocus }) {
           onFocus={() => setFocus("pickup")}
           onBlur={() => setFocus("")}
         />
+          <div className="compo">
         <ComboboxPopover>
-          <ComboboxList>
-            {status === "OK" &&
-              data.map(({ id, description }) => (
-                <ComboboxOption key={description} value={description} />
-              ))}
-          </ComboboxList>
+            <ComboboxList className="compo">
+                {status === "OK" &&
+                data.map(({ id, description }) => (
+                    <ComboboxOption key={description} value={description} />
+                ))}
+            </ComboboxList>
         </ComboboxPopover>
+          </div>
       </Combobox>
     </StyledCombobox>
   );
@@ -80,6 +82,10 @@ const StyledCombobox = styled.div`
     padding: 0.5rem;
     font-size: 1.5rem;
     width: 100%;
+  }
+
+  compo {
+    background-color: white;
   }
 
   h1 {
